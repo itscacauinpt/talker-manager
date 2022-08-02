@@ -1,6 +1,6 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-const talkers = require('./talker.json');
+const { readFile } = require('./fileSystem');
 
 const app = express();
 app.use(bodyParser.json());
@@ -13,7 +13,8 @@ app.get('/', (_request, response) => {
   response.status(HTTP_OK_STATUS).send();
 });
 
-app.get('/talker', (_request, response) => {
+app.get('/talker', async (_request, response) => {
+  const talkers = await readFile();
   if (!talkers || talkers.length === 0) {
     return response.status(200).json([]);
   }
