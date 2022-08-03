@@ -5,6 +5,12 @@ async function readFile() {
   return JSON.parse(file);
 }
 
+async function writeFile(newFile) {
+  const file = await fs.writeFile('./talker.json', JSON.stringify(newFile));
+  return file;
+}
+
 module.exports = {
   readFile,
+  writeFile,
 };

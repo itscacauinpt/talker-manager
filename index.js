@@ -1,13 +1,15 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const crypto = require('crypto');
-const { readFile } = require('./fileSystem');
+const { readFile, writeFile } = require('./fileSystem');
 const {
   validateUser,
   validateTalkDate,
-  validateTalker,
+  validateName,
+  validateAge,
   validateToken,
   validateRate,
+  validateTalk,
 } = require('./userValidation');
 
 const app = express();
@@ -47,24 +49,23 @@ app.post('/login', validateUser, (_request, response) => {
   return response.status(200).json({ token });
 });
 
-app.post('/talker', validateTalker, validateToken, validateTalkDate,
-  validateRate, async (request, response) => {
-  // const { name, age, talk } = request.body;
+app.post('/talker', validateToken, validateName,
+  validateAge, validateTalk, validateTalkDate, validateRate,
+  async (request, response) => {
   const talkers = await readFile();
 
-  talkers.push({
+  const newTalker = {
     id: talkers.length + 1,
     ...request.body,
-    // name,
-    // age,
-    // talk: {
-    //   rate: talk.rate,
-    //   watchedAt: talk.watchedAt,
-    // },
-  });
+  };
+
+  talkers.push(newTalker);
+
+  await writeFile(talkers);
+
   console.log(talkers[talkers.length - 1]);
 
-  return response.status(201).json(talkers[talkers.length - 1]);
+  return response.status(201).json(newTalker);
 });
 
 app.listen(PORT, () => {

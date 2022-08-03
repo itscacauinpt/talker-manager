@@ -32,8 +32,8 @@ function validateToken(request, response, next) {
   next();
 }
 
-function validateTalker(request, response, next) {
-  const { name, age } = request.body;
+function validateName(request, response, next) {
+  const { name } = request.body;
 
   if (!name) {
     return response.status(400).json({ message: 'O campo "name" é obrigatório' });
@@ -41,6 +41,13 @@ function validateTalker(request, response, next) {
   if (name.length < 3) {
     return response.status(400).json({ message: 'O "name" deve ter pelo menos 3 caracteres' });
   }
+
+  next();
+}
+
+function validateAge(request, response, next) {
+  const { age } = request.body;
+
   if (!age) {
     return response.status(400).json({ message: 'O campo "age" é obrigatório' });
   }
@@ -54,11 +61,14 @@ function validateTalker(request, response, next) {
 function validateTalkDate(request, response, next) {
   const { talk } = request.body;
   const dateRegex = /^(0[1-9]|[12][0-9]|3[01])[- /.](0[1-9]|1[012])[- /.](19|20)\d\d$/;
-  const dataValid = dateRegex.test(talk.watchedAt);
 
   if (!talk.watchedAt) {
     return response.status(400).json({ message: 'O campo "watchedAt" é obrigatório' });
   }
+
+  const dataValid = dateRegex.test(talk.watchedAt);
+  console.log(dataValid);
+
   if (!dataValid) {
     return response.status(400).json({
       message: 'O campo "watchedAt" deve ter o formato "dd/mm/aaaa"',
@@ -71,9 +81,6 @@ function validateTalkDate(request, response, next) {
 function validateRate(request, response, next) {
   const { talk } = request.body;
 
-  if (!talk) {
-    return response.status(400).json({ message: 'O campo "talk" é obrigatório' });
-  }
   if (!talk.rate) {
     return response.status(400).json({ message: 'O campo "rate" é obrigatório' });
   }
@@ -84,10 +91,22 @@ function validateRate(request, response, next) {
   next();
 }
 
+function validateTalk(request, response, next) {
+  const { talk } = request.body;
+
+  if (!talk) {
+    return response.status(400).json({ message: 'O campo "talk" é obrigatório' });
+  }
+
+  next();
+}
+
 module.exports = {
   validateUser,
-  validateTalker,
+  validateName,
+  validateAge,
   validateToken,
   validateRate,
   validateTalkDate,
+  validateTalk,
 };
