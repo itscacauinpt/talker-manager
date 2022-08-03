@@ -81,11 +81,11 @@ function validateTalkDate(request, response, next) {
 function validateRate(request, response, next) {
   const { talk } = request.body;
 
-  if (!talk.rate) {
-    return response.status(400).json({ message: 'O campo "rate" é obrigatório' });
-  }
   if (talk.rate < 1 || talk.rate > 5) {
     return response.status(400).json({ message: 'O campo "rate" deve ser um inteiro de 1 à 5' });
+  }
+  if (!talk.rate) {
+    return response.status(400).json({ message: 'O campo "rate" é obrigatório' });
   }
 
   next();

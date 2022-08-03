@@ -60,12 +60,29 @@ app.post('/talker', validateToken, validateName,
   };
 
   talkers.push(newTalker);
-
   await writeFile(talkers);
-
-  console.log(talkers[talkers.length - 1]);
-
   return response.status(201).json(newTalker);
+});
+
+app.put('/talker/:id', validateToken, validateName,
+  validateAge, validateTalk, validateTalkDate, validateRate,
+  async (request, response) => {
+  const { id } = request.params;
+  // console.log(typeof id);
+  const talkers = await readFile();
+
+  // const findTalker = talkers.find((talker) => Number(talker.id) === Number(id));
+  const findTalkerInd = talkers.findIndex((talker) => Number(talker.id) === Number(id));
+  let editedTalker = talkers[findTalkerInd];
+
+  editedTalker = {
+    id,
+    ...request.body,
+  };
+
+  talkers.push(editedTalker);
+  await writeFile(talkers);
+  return response.status(200).json(editedTalker);
 });
 
 app.listen(PORT, () => {
