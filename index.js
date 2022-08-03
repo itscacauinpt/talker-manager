@@ -76,7 +76,7 @@ app.put('/talker/:id', validateToken, validateName,
   let editedTalker = talkers[findTalkerInd];
 
   editedTalker = {
-    id,
+    id: Number(id),
     ...request.body,
   };
 
