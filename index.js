@@ -85,6 +85,17 @@ app.put('/talker/:id', validateToken, validateName,
   return response.status(200).json(editedTalker);
 });
 
+app.delete('/talker/:id', validateToken, async (request, response) => {
+  const talkers = await readFile();
+  const { id } = request.params;
+
+  const deleteTalker = talkers
+    .filter((talker) => Number(talker.id) !== Number(id));
+
+  await writeFile(deleteTalker);
+  return response.status(204).json();
+});
+
 app.listen(PORT, () => {
   console.log('Online');
 });
