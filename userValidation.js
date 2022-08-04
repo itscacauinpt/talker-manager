@@ -101,6 +101,11 @@ function validateTalk(request, response, next) {
   next();
 }
 
+// function validateSearch(request, response) {
+//   const { theQuery } = request.query;
+  
+// }
+
 module.exports = {
   validateUser,
   validateName,
@@ -109,4 +114,5 @@ module.exports = {
   validateRate,
   validateTalkDate,
   validateTalk,
+  // validateSearch,
 };

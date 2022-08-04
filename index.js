@@ -10,6 +10,7 @@ const {
   validateToken,
   validateRate,
   validateTalk,
+  // validateSearch,
 } = require('./userValidation');
 
 const app = express();
@@ -21,6 +22,18 @@ const PORT = '3000';
 // não remova esse endpoint, e para o avaliador funcionar
 app.get('/', (_request, response) => {
   response.status(HTTP_OK_STATUS).send();
+});
+
+// ?q=searchTerm
+app.get('/talker/search', validateToken, async (request, response) => {
+  const { q: name } = request.query;
+  const talkers = await readFile();
+
+  if (!name) return response.status(200).json(talkers);
+  const filteredTalkers = talkers.filter((talker) => talker.name.includes(name));
+  if (filteredTalkers.length === 0) return response.status(200).json([]);
+
+  return response.status(200).json(filteredTalkers);
 });
 
 app.get('/talker', async (_request, response) => {
