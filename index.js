@@ -1,17 +1,17 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const crypto = require('crypto');
-const { readFile, writeFile } = require('./fileSystem');
+const { readFile, writeFile } = require('./service/fileSystem');
+const validateUser = require('./middleware/loginValidation');
 const {
-  validateUser,
+  validateTalker,
   validateTalkDate,
-  validateName,
-  validateAge,
+  // validateName,
+  // validateAge,
   validateToken,
   validateRate,
   validateTalk,
-  // validateSearch,
-} = require('./userValidation');
+} = require('./middleware/talkValidation');
 
 const app = express();
 app.use(bodyParser.json());
@@ -62,8 +62,8 @@ app.post('/login', validateUser, (_request, response) => {
   return response.status(200).json({ token });
 });
 
-app.post('/talker', validateToken, validateName,
-  validateAge, validateTalk, validateTalkDate, validateRate,
+app.post('/talker', validateToken, validateTalker,
+  validateTalk, validateTalkDate, validateRate,
   async (request, response) => {
   const talkers = await readFile();
 
@@ -77,8 +77,8 @@ app.post('/talker', validateToken, validateName,
   return response.status(201).json(newTalker);
 });
 
-app.put('/talker/:id', validateToken, validateName,
-  validateAge, validateTalk, validateTalkDate, validateRate,
+app.put('/talker/:id', validateToken, validateTalker,
+  validateTalk, validateTalkDate, validateRate,
   async (request, response) => {
   const { id } = request.params;
   // console.log(typeof id);
