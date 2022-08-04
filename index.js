@@ -1,10 +1,12 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-const crypto = require('crypto');
-const { readFile, writeFile } = require('./service/fileSystem');
-const validateUser = require('./middleware/loginValidation');
-const { validateTalkDate, validateTalker, validateToken,
-  validateRate, validateTalk } = require('./middleware/talkValidation');
+const routerLogin = require('./routes/router-login.js');
+const routerTalker = require('./routes/router-talker.js');
+// const crypto = require('crypto');
+// const { readFile, writeFile } = require('./service/fileSystem');
+// const validateUser = require('./middleware/loginValidation');
+// const { validateTalkDate, validateTalker, validateToken,
+//   validateRate, validateTalk } = require('./middleware/talkValidation');
 
 const app = express();
 app.use(bodyParser.json());
@@ -17,87 +19,90 @@ app.get('/', (_request, response) => {
   response.status(HTTP_OK_STATUS).send();
 });
 
-app.get('/talker/search', validateToken, async (request, response) => {
-  const { q: name } = request.query;
-  const talkers = await readFile();
+app.use('/login', routerLogin);
+app.use('/talker', routerTalker);
 
-  if (!name) return response.status(200).json(talkers);
-  const filteredTalkers = talkers.filter((talker) => talker.name.includes(name));
-  if (filteredTalkers.length === 0) return response.status(200).json([]);
+// app.get('/talker/search', validateToken, async (request, response) => {
+//   const { q: name } = request.query;
+//   const talkers = await readFile();
 
-  return response.status(200).json(filteredTalkers);
-});
+//   if (!name) return response.status(200).json(talkers);
+//   const filteredTalkers = talkers.filter((talker) => talker.name.includes(name));
+//   if (filteredTalkers.length === 0) return response.status(200).json([]);
 
-app.get('/talker', async (_request, response) => {
-  const talkers = await readFile();
-  if (!talkers || talkers.length === 0) {
-    return response.status(200).json([]);
-  }
-  return response.status(200).json(talkers);
-});
+//   return response.status(200).json(filteredTalkers);
+// });
 
-app.get('/talker/:id', async (request, response) => {
-  const talkers = await readFile();
-  const { id } = request.params;
-  const talkerId = talkers.find((t) => t.id === Number(id));
+// app.get('/talker', async (_request, response) => {
+//   const talkers = await readFile();
+//   if (!talkers || talkers.length === 0) {
+//     return response.status(200).json([]);
+//   }
+//   return response.status(200).json(talkers);
+// });
 
-  if (!talkerId) {
-    return response.status(404).json({ message: 'Pessoa palestrante não encontrada' });
-  }
+// app.get('/talker/:id', async (request, response) => {
+//   const talkers = await readFile();
+//   const { id } = request.params;
+//   const talkerId = talkers.find((t) => t.id === Number(id));
 
-  return response.status(200).json(talkerId);
-});
+//   if (!talkerId) {
+//     return response.status(404).json({ message: 'Pessoa palestrante não encontrada' });
+//   }
 
-app.post('/login', validateUser, (_request, response) => {
-  const token = crypto.randomBytes(8).toString('hex');
+//   return response.status(200).json(talkerId);
+// });
 
-  return response.status(200).json({ token });
-});
+// app.post('/login', validateUser, (_request, response) => {
+//   const token = crypto.randomBytes(8).toString('hex');
 
-app.post('/talker', validateToken, validateTalker,
-  validateTalk, validateTalkDate, validateRate,
-  async (request, response) => {
-  const talkers = await readFile();
+//   return response.status(200).json({ token });
+// });
 
-  const newTalker = {
-    id: talkers.length + 1,
-    ...request.body,
-  };
+// app.post('/talker', validateToken, validateTalker,
+//   validateTalk, validateTalkDate, validateRate,
+//   async (request, response) => {
+//   const talkers = await readFile();
 
-  talkers.push(newTalker);
-  await writeFile(talkers);
-  return response.status(201).json(newTalker);
-});
+//   const newTalker = {
+//     id: talkers.length + 1,
+//     ...request.body,
+//   };
 
-app.put('/talker/:id', validateToken, validateTalker,
-  validateTalk, validateTalkDate, validateRate,
-  async (request, response) => {
-  const { id } = request.params;
-  const talkers = await readFile();
+//   talkers.push(newTalker);
+//   await writeFile(talkers);
+//   return response.status(201).json(newTalker);
+// });
 
-  const findTalkerInd = talkers.findIndex((talker) => Number(talker.id) === Number(id));
-  let editedTalker = talkers[findTalkerInd];
+// app.put('/talker/:id', validateToken, validateTalker,
+//   validateTalk, validateTalkDate, validateRate,
+//   async (request, response) => {
+//   const { id } = request.params;
+//   const talkers = await readFile();
 
-  editedTalker = {
-    id: Number(id),
-    ...request.body,
-  };
+//   const findTalkerInd = talkers.findIndex((talker) => Number(talker.id) === Number(id));
+//   let editedTalker = talkers[findTalkerInd];
 
-  talkers.push(editedTalker);
-  await writeFile(talkers);
-  return response.status(200).json(editedTalker);
-});
+//   editedTalker = {
+//     id: Number(id),
+//     ...request.body,
+//   };
 
-app.delete('/talker/:id', validateToken, async (request, response) => {
-  const talkers = await readFile();
-  const { id } = request.params;
+//   talkers.push(editedTalker);
+//   await writeFile(talkers);
+//   return response.status(200).json(editedTalker);
+// });
 
-  const deleteTalker = talkers
-    .filter((talker) => Number(talker.id) !== Number(id));
+// app.delete('/talker/:id', validateToken, async (request, response) => {
+//   const talkers = await readFile();
+//   const { id } = request.params;
 
-  await writeFile(deleteTalker);
-  return response.status(204).json();
-});
+//   const deleteTalker = talkers
+//     .filter((talker) => Number(talker.id) !== Number(id));
+
+//   await writeFile(deleteTalker);
+//   return response.status(204).json();
+// });
 
 app.listen(PORT, () => {
   console.log('Online');
