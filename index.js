@@ -3,15 +3,8 @@ const bodyParser = require('body-parser');
 const crypto = require('crypto');
 const { readFile, writeFile } = require('./service/fileSystem');
 const validateUser = require('./middleware/loginValidation');
-const {
-  validateTalker,
-  validateTalkDate,
-  // validateName,
-  // validateAge,
-  validateToken,
-  validateRate,
-  validateTalk,
-} = require('./middleware/talkValidation');
+const { validateTalkDate, validateTalker, validateToken,
+  validateRate, validateTalk } = require('./middleware/talkValidation');
 
 const app = express();
 app.use(bodyParser.json());
@@ -24,7 +17,6 @@ app.get('/', (_request, response) => {
   response.status(HTTP_OK_STATUS).send();
 });
 
-// ?q=searchTerm
 app.get('/talker/search', validateToken, async (request, response) => {
   const { q: name } = request.query;
   const talkers = await readFile();
@@ -81,10 +73,8 @@ app.put('/talker/:id', validateToken, validateTalker,
   validateTalk, validateTalkDate, validateRate,
   async (request, response) => {
   const { id } = request.params;
-  // console.log(typeof id);
   const talkers = await readFile();
 
-  // const findTalker = talkers.find((talker) => Number(talker.id) === Number(id));
   const findTalkerInd = talkers.findIndex((talker) => Number(talker.id) === Number(id));
   let editedTalker = talkers[findTalkerInd];
 
